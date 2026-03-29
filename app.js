@@ -21,6 +21,8 @@ app.get('/', (req, res) => {
                 padding: 30px;
                 border-radius: 10px;
                 display: inline-block;
+                position: relative;
+                z-index: 2;
             }
             h1 {
                 font-size: 40px;
@@ -47,6 +49,7 @@ app.get('/', (req, res) => {
                 top: 0;
                 left: 0;
                 pointer-events: none;
+                z-index: 1;
             }
         </style>
     </head>
@@ -72,40 +75,43 @@ app.get('/', (req, res) => {
             let particles = [];
 
             function createFirework(x, y) {
-                for (let i = 0; i < 50; i++) {
+                for (let i = 0; i < 40; i++) {
                     particles.push({
                         x: x,
                         y: y,
-                        radius: Math.random() * 3,
+                        radius: Math.random() * 3 + 1,
                         color: 'hsl(' + Math.random() * 360 + ', 100%, 50%)',
-                        speedX: (Math.random() - 0.5) * 5,
-                        speedY: (Math.random() - 0.5) * 5
+                        speedX: (Math.random() - 0.5) * 6,
+                        speedY: (Math.random() - 0.5) * 6,
+                        life: 100
                     });
                 }
             }
 
             function animate() {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                // ❗ CLEAR instead of dark overlay
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
 
                 particles.forEach((p, i) => {
                     p.x += p.speedX;
                     p.y += p.speedY;
+                    p.life--;
 
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
                     ctx.fillStyle = p.color;
                     ctx.fill();
 
-                    if (p.radius > 0.1) p.radius -= 0.05;
-                    else particles.splice(i, 1);
+                    if (p.life <= 0) {
+                        particles.splice(i, 1);
+                    }
                 });
 
                 requestAnimationFrame(animate);
             }
 
             function startFireworks() {
-                for (let i = 0; i < 5; i++) {
+                for (let i = 0; i < 6; i++) {
                     createFirework(
                         Math.random() * canvas.width,
                         Math.random() * canvas.height / 2
